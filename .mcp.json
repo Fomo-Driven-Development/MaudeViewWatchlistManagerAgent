@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "maudeview-watchlist-manager": {
+      "command": "go",
+      "args": ["run", "."],
+      "cwd": "."
+    }
+  }
+}
