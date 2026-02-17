@@ -1,0 +1,22 @@
+[project]
+name = "maudeview-watchlist-manager-agent"
+version = "0.1.0"
+description = "Manage TradingView watchlists"
+requires-python = ">=3.11"
+dependencies = [
+    "claude-agent-sdk>=0.1.12",
+    "pydantic>=2.0.0",
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+]
+
+[project.scripts]
+maudeview-agent = "maudeview_agent.main:main"
+maudeview-agent-a2a = "maudeview_agent.a2a.server:run_a2a_server"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/maudeview_agent"]
