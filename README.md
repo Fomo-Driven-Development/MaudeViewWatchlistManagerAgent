@@ -6,6 +6,10 @@ This is a reference implementation of the [MaudeView agent pattern](https://fomo
 
 **[Full Documentation](https://fomo-driven-development.github.io/MaudeViewTvDocs/)** — architecture, quickstart, API reference, building agents.
 
+> **WARNING — Security**
+>
+> The managed browser uses a **dedicated profile** — **only log into TradingView in this browser. Do not log into any other websites** (email, banking, social media, etc.). The controller can execute arbitrary JavaScript in any matched tab. CDP and the REST API have no authentication. See the [Security guide](https://fomo-driven-development.github.io/MaudeViewTvDocs/security/) for details.
+
 ## Tools (50)
 
 ### Watchlists (15)
