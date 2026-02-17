@@ -1,0 +1,9 @@
+bin/
+.env
+__pycache__/
+*.pyc
+.venv/
+.mypy_cache/
+chromium-profile/
+logs/
+snapshots/
