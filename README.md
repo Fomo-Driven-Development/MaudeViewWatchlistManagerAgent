@@ -2,6 +2,10 @@
 
 Go MCP server + Python A2A layer for managing TradingView watchlists and charts.
 
+This is a reference implementation of the [MaudeView agent pattern](https://fomo-driven-development.github.io/MaudeViewTvDocs/building-agents/) — a thin client that wraps [MaudeViewTVCore](https://github.com/Fomo-Driven-Development/MaudeViewTVCore) REST endpoints as MCP tools. Fork it to build your own agent.
+
+**[Full Documentation](https://fomo-driven-development.github.io/MaudeViewTvDocs/)** — architecture, quickstart, API reference, building agents.
+
 ## Tools (50)
 
 ### Watchlists (15)
@@ -40,6 +44,8 @@ Go MCP server + Python A2A layer for managing TradingView watchlists and charts.
 ```bash
 just setup
 ```
+
+See the [Quick Start guide](https://fomo-driven-development.github.io/MaudeViewTvDocs/quickstart/) for the full walkthrough.
 
 ## Usage
 
