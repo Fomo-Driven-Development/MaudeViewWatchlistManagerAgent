@@ -5,6 +5,7 @@ import logging
 from pathlib import Path
 from typing import Any
 
+import httpx
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -36,6 +37,17 @@ def _load_agent_card() -> dict[str, Any]:
         "description": "TradingView chart control agent",
         "version": "1.0.0",
     }
+
+
+async def _fetch_lmstudio_models() -> list[dict[str, Any]]:
+    """Fetch loaded models from LM Studio's /api/v0/models endpoint."""
+    async with httpx.AsyncClient(timeout=10.0) as client:
+        resp = await client.get(
+            f"{config.lmstudio_base_url.rstrip('/')}/api/v0/models",
+        )
+        resp.raise_for_status()
+        all_models = resp.json().get("data", [])
+        return [m for m in all_models if m.get("state") == "loaded"]
 
 
 def create_a2a_app() -> FastAPI:
@@ -98,6 +110,16 @@ def create_a2a_app() -> FastAPI:
                 }
             )
 
+    @app.get("/models")
+    async def list_models():
+        """List available LM Studio models."""
+        if not config.is_lmstudio:
+            return JSONResponse(
+                content={"models": [], "note": "Backend is not LM Studio"},
+            )
+        models = await _fetch_lmstudio_models()
+        return JSONResponse(content={"models": models})
+
     @app.get("/health")
     async def health_check():
         """Health check endpoint."""
@@ -117,6 +139,8 @@ async def _handle_rpc_method(request: JsonRpcRequest) -> dict[str, Any]:
         return await _handle_tasks_get(params)
     elif method == "tasks/cancel":
         return await _handle_tasks_cancel(params)
+    elif method == "models/list":
+        return await _handle_models_list()
     elif method == "agent/info":
         return _load_agent_card()
     else:
@@ -134,10 +158,20 @@ async def _handle_tasks_send(params: dict[str, Any]) -> dict[str, Any]:
         task = Task(status=TaskStatus(state=TaskState.SUBMITTED))
         task_handler.tasks[task.id] = task
 
-    task = await task_handler.process_task(task, send_params.message)
+    task = await task_handler.process_task(
+        task, send_params.message, model=send_params.model
+    )
     task_handler.tasks[task.id] = task
 
     return task.model_dump()
+
+
+async def _handle_models_list() -> dict[str, Any]:
+    """Handle models/list - return available LM Studio models."""
+    if not config.is_lmstudio:
+        return {"models": [], "note": "Backend is not LM Studio"}
+    models = await _fetch_lmstudio_models()
+    return {"models": models}
 
 
 async def _handle_tasks_get(params: dict[str, Any]) -> dict[str, Any]:

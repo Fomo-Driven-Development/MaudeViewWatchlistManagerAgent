@@ -89,6 +89,7 @@ class TaskSendParams(BaseModel):
 
     message: Message
     id: str | None = None
+    model: str | None = None
 
 
 class TaskGetParams(BaseModel):

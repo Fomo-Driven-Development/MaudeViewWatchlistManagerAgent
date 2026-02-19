@@ -91,6 +91,15 @@ class LMStudioClient:
         logger.debug("LLM response stop_reason=%s", data.get("stop_reason"))
         return data
 
+    async def list_models(self) -> list[dict]:
+        """GET /api/v0/models and return only loaded models."""
+        assert self._client is not None, "Client not started"
+
+        resp = await self._client.get("/api/v0/models")
+        resp.raise_for_status()
+        all_models = resp.json().get("data", [])
+        return [m for m in all_models if m.get("state") == "loaded"]
+
     # -- context manager --
 
     async def __aenter__(self) -> "LMStudioClient":

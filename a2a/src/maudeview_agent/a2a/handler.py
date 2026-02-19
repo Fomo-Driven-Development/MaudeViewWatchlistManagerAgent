@@ -21,7 +21,9 @@ class TaskHandler:
     def __init__(self):
         self.tasks: dict[str, Task] = {}
 
-    async def process_task(self, task: Task, message: Message) -> Task:
+    async def process_task(
+        self, task: Task, message: Message, model: str | None = None
+    ) -> Task:
         """Process a task by sending the user message to the configured backend."""
         task.history.append(message)
         task.status = TaskStatus(state=TaskState.WORKING)
@@ -32,7 +34,7 @@ class TaskHandler:
             )
 
             if config.is_lmstudio:
-                response_text = await self._query_lmstudio(user_text)
+                response_text = await self._query_lmstudio(user_text, model=model)
             else:
                 response_text = await self._query_claude(user_text)
 
@@ -69,11 +71,11 @@ class TaskHandler:
 
         return "\n".join(result_parts) if result_parts else "No response generated."
 
-    async def _query_lmstudio(self, prompt: str) -> str:
+    async def _query_lmstudio(self, prompt: str, model: str | None = None) -> str:
         """Send prompt to LM Studio with MCP tools, collect response text."""
         from ..lmstudio import LMStudioAgent
 
-        async with LMStudioAgent() as agent:
+        async with LMStudioAgent(model=model) as agent:
             response = await agent.query(prompt)
             return response.text
 
