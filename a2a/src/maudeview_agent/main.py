@@ -5,7 +5,6 @@ import logging
 
 from claude_agent_sdk import (
     AssistantMessage,
-    ClaudeAgentOptions,
     ClaudeSDKClient,
     ResultMessage,
     TextBlock,
@@ -13,7 +12,7 @@ from claude_agent_sdk import (
 )
 
 from .config import config
-from .prompts import ALLOWED_TOOLS, MCP_SERVER_NAME, SYSTEM_PROMPT
+from .options import build_claude_options
 
 logging.basicConfig(
     level=logging.INFO,
@@ -21,31 +20,9 @@ logging.basicConfig(
 )
 
 
-def _build_options() -> ClaudeAgentOptions:
-    """Build ClaudeAgentOptions with the Go MCP server as a subprocess."""
-    return ClaudeAgentOptions(
-        mcp_servers={
-            MCP_SERVER_NAME: {
-                "type": "stdio",
-                "command": str(config.mcp_binary_path),
-                "env": {"CONTROLLER_BIND_ADDR": config.controller_bind_addr},
-            }
-        },
-        allowed_tools=ALLOWED_TOOLS,
-        system_prompt=SYSTEM_PROMPT,
-    )
-
-
-async def run_interactive_chat():
-    """Run an interactive multi-turn chat session."""
-    options = _build_options()
-
-    print("MaudeView Agent")
-    print("=" * 50)
-    print("Control TradingView charts via natural language.")
-    print("Type 'quit' or 'exit' to end the session.")
-    print("=" * 50)
-    print()
+async def _run_claude_chat() -> None:
+    """Interactive chat loop using Claude Agent SDK."""
+    options = build_claude_options()
 
     async with ClaudeSDKClient(options=options) as client:
         while True:
@@ -76,6 +53,49 @@ async def run_interactive_chat():
                     if msg.total_cost_usd:
                         print(f"\n[Cost: ${msg.total_cost_usd:.6f}]")
             print()
+
+
+async def _run_lmstudio_chat() -> None:
+    """Interactive chat loop using LM Studio direct backend."""
+    from .lmstudio import LMStudioAgent
+
+    async with LMStudioAgent() as agent:
+        while True:
+            try:
+                user_input = input("You: ").strip()
+            except (EOFError, KeyboardInterrupt):
+                print("\nGoodbye!")
+                break
+
+            if user_input.lower() in ("quit", "exit", "q"):
+                print("Goodbye!")
+                break
+
+            if not user_input:
+                continue
+
+            print()
+            response = await agent.query(user_input)
+            if response.tool_calls_made:
+                print(f"[Tools used: {', '.join(response.tool_calls_made)}]")
+            print(f"Assistant: {response.text}")
+            print()
+
+
+async def run_interactive_chat() -> None:
+    """Run an interactive multi-turn chat session."""
+    print("MaudeView Agent")
+    print("=" * 50)
+    print(f"Backend: {config.backend_label}")
+    print("Control TradingView charts via natural language.")
+    print("Type 'quit' or 'exit' to end the session.")
+    print("=" * 50)
+    print()
+
+    if config.is_lmstudio:
+        await _run_lmstudio_chat()
+    else:
+        await _run_claude_chat()
 
 
 def main():
