@@ -58,3 +58,20 @@ just agent    # Interactive CLI
 just a2a      # A2A server on :8100
 just mcp      # Raw MCP server (stdio)
 ```
+
+### LM Studio Backend
+
+By default the agent uses the Claude API. Set `AGENT_BACKEND=lmstudio` to use a local LM Studio instance instead — this calls LM Studio's `/v1/messages` endpoint directly and manages the MCP tool-calling loop in Python.
+
+```bash
+AGENT_BACKEND=lmstudio just agent    # Interactive CLI via LM Studio
+AGENT_BACKEND=lmstudio just a2a      # A2A server via LM Studio
+```
+
+Configure the connection in `.env`:
+
+```
+LMSTUDIO_BASE_URL=http://localhost:1234
+LMSTUDIO_AUTH_TOKEN=lmstudio
+LMSTUDIO_MODEL=qwen/qwen3-coder-next
+```
