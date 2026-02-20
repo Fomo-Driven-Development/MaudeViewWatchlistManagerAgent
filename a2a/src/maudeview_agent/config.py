@@ -13,6 +13,7 @@ class Config:
     mcp_binary_path: Path = Path("../bin/agent")
     a2a_host: str = "0.0.0.0"
     a2a_port: int = 8100
+    a2a_url: str = "http://localhost:8100/a2a"
 
     # Backend selection: "claude" or "lmstudio"
     agent_backend: str = "claude"
@@ -35,6 +36,7 @@ class Config:
             mcp_binary_path=resolved,
             a2a_host=environ.get("A2A_HOST", cls.a2a_host),
             a2a_port=int(environ.get("A2A_PORT", str(cls.a2a_port))),
+            a2a_url=environ.get("A2A_URL", cls.a2a_url),
             agent_backend=environ.get("AGENT_BACKEND", cls.agent_backend),
             lmstudio_base_url=environ.get(
                 "LMSTUDIO_BASE_URL", cls.lmstudio_base_url

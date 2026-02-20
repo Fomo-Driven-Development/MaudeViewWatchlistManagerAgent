@@ -28,15 +28,18 @@ AGENT_CARD_PATH = Path(__file__).parent.parent.parent.parent / "agent-card.json"
 
 
 def _load_agent_card() -> dict[str, Any]:
-    """Load the agent card from JSON file."""
+    """Load the agent card from JSON file, injecting the configured URL."""
     if AGENT_CARD_PATH.exists():
         with open(AGENT_CARD_PATH) as f:
-            return json.load(f)
-    return {
-        "name": "MaudeView Agent",
-        "description": "TradingView chart control agent",
-        "version": "1.0.0",
-    }
+            card = json.load(f)
+    else:
+        card = {
+            "name": "MaudeView Agent",
+            "description": "TradingView chart control agent",
+            "version": "1.0.0",
+        }
+    card["url"] = config.a2a_url
+    return card
 
 
 async def _fetch_lmstudio_models() -> list[dict[str, Any]]:
