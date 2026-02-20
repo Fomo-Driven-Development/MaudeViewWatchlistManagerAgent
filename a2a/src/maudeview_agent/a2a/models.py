@@ -20,17 +20,25 @@ class TaskState(str, Enum):
 
 
 class TextPart(BaseModel):
-    """Text content part."""
+    """Text content part. Uses 'kind' as discriminator per newer A2A spec."""
 
-    type: str = "text"
+    kind: str = "text"
     text: str
+
+    class Config:
+        extra = "allow"
 
 
 class Message(BaseModel):
     """A2A message in a task."""
 
+    kind: str = "message"
+    messageId: str = Field(default_factory=lambda: str(uuid4()))
     role: str  # "user" or "agent"
     parts: list[TextPart]
+
+    class Config:
+        extra = "allow"
 
 
 class TaskStatus(BaseModel):
@@ -46,7 +54,9 @@ class TaskStatus(BaseModel):
 class Task(BaseModel):
     """A2A task representation."""
 
+    kind: str = "task"
     id: str = Field(default_factory=lambda: str(uuid4()))
+    contextId: str = Field(default_factory=lambda: str(uuid4()))
     status: TaskStatus
     history: list[Message] = Field(default_factory=list)
     artifacts: list[dict[str, Any]] = Field(default_factory=list)
@@ -85,11 +95,14 @@ class JsonRpcError(BaseModel):
 
 
 class TaskSendParams(BaseModel):
-    """Parameters for tasks/send method."""
+    """Parameters for tasks/send and message/send methods."""
 
     message: Message
     id: str | None = None
     model: str | None = None
+
+    class Config:
+        extra = "allow"
 
 
 class TaskGetParams(BaseModel):

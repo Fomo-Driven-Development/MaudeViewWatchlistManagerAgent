@@ -1,4 +1,5 @@
 {
+  "url": "http://dev1-oryx.lan:8100/a2a",
   "name": "MaudeView Watchlist Manager Agent",
   "description": "Manage TradingView watchlists and chart symbols via natural language. Create, rename, and delete watchlists. Add and remove symbols. Color-code and flag symbols. Control chart symbols, resolution, type, and navigation.",
   "version": "1.0.0",
@@ -12,6 +13,7 @@
       "id": "watchlist-management",
       "name": "Watchlist Management",
       "description": "Create, rename, delete watchlists. Add/remove symbols. Flag and color-code symbols.",
+      "tags": ["tradingview", "watchlist", "symbols"],
       "examples": [
         "Create a watchlist called Tech Stocks",
         "Add NASDAQ:AAPL and NASDAQ:GOOGL to my watchlist",
@@ -24,6 +26,7 @@
       "id": "chart-control",
       "name": "Chart Control",
       "description": "Set chart symbols, resolution, type, currency, and navigate charts.",
+      "tags": ["tradingview", "chart", "navigation"],
       "examples": [
         "Set the chart to NASDAQ:AAPL on the daily timeframe",
         "Switch to candlestick chart",

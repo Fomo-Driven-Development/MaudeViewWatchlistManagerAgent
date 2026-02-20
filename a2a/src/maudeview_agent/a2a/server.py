@@ -93,6 +93,18 @@ def create_a2a_app() -> FastAPI:
 
         try:
             result = await _handle_rpc_method(rpc_request)
+
+            # The a2a-client Rust library expects message/send and tasks/send
+            # responses to have a double-wrapped JSON-RPC envelope:
+            # the outer result field must itself be a JSON-RPC success response
+            # containing the actual result (SendMessageSuccessResponse layout).
+            if rpc_request.method in ("tasks/send", "message/send"):
+                result = {
+                    "jsonrpc": "2.0",
+                    "id": rpc_request.id,
+                    "result": result,
+                }
+
             return JSONResponse(
                 content={
                     "jsonrpc": "2.0",
@@ -133,7 +145,7 @@ async def _handle_rpc_method(request: JsonRpcRequest) -> dict[str, Any]:
     method = request.method
     params = request.params
 
-    if method == "tasks/send":
+    if method in ("tasks/send", "message/send"):
         return await _handle_tasks_send(params)
     elif method == "tasks/get":
         return await _handle_tasks_get(params)
