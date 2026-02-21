@@ -86,6 +86,7 @@ def create_a2a_app() -> FastAPI:
             body = await request.json()
             rpc_request = JsonRpcRequest(**body)
         except Exception as e:
+            logger.warning("Failed to parse A2A request: %s", e)
             return JSONResponse(
                 content={
                     "jsonrpc": "2.0",
@@ -93,6 +94,8 @@ def create_a2a_app() -> FastAPI:
                     "error": {"code": -32700, "message": f"Parse error: {e}"},
                 }
             )
+
+        logger.info("A2A request: method=%s id=%s", rpc_request.method, rpc_request.id)
 
         try:
             result = await _handle_rpc_method(rpc_request)
@@ -217,6 +220,11 @@ async def _handle_tasks_cancel(params: dict[str, Any]) -> dict[str, Any]:
 def run_a2a_server():
     """Run the A2A server."""
     import uvicorn
+
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    )
 
     app = create_a2a_app()
     uvicorn.run(
