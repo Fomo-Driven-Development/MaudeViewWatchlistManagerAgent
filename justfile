@@ -31,9 +31,20 @@ build:
 install:
 	cd a2a && uv sync
 
-# Install tv_controller binary from MaudeViewTVCore
+# Install tv_controller binary from latest MaudeViewTVCore release
 install-controller:
-	GOBIN={{justfile_directory()}}/bin go install github.com/dgnsrekt/MaudeViewTVCore/cmd/tv_controller@latest
+    #!/usr/bin/env bash
+    set -euo pipefail
+    OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+    ARCH=$(uname -m)
+    [ "$ARCH" = "x86_64" ] && ARCH="amd64"
+    [ "$ARCH" = "aarch64" ] && ARCH="arm64"
+    mkdir -p bin
+    echo "Downloading tv_controller (${OS}/${ARCH})..."
+    curl -fsSL "https://github.com/Fomo-Driven-Development/MaudeViewTVCore/releases/latest/download/tv_controller_${OS}_${ARCH}" \
+        -o bin/tv_controller
+    chmod +x bin/tv_controller
+    echo "Done."
 
 # Full setup: build Go binary + install Python package + install controller
 setup: build install install-controller
