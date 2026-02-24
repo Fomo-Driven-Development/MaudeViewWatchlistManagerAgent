@@ -43,11 +43,20 @@ This is a reference implementation of the [MaudeView agent pattern](https://fomo
 - `execute_chart_action` / `list_chart_panes` - Introspection
 - `next_chart` / `prev_chart` / `maximize_chart` / `activate_chart` - Multi-pane
 
+## Prerequisites
+
+- **Go 1.24+** — to build the Go MCP binary
+- **Python 3.11+** and **[uv](https://github.com/astral-sh/uv)** — for the A2A layer
+- **[just](https://github.com/casey/just)** — task runner
+- **Anthropic API key** — for the Claude agent backend
+
 ## Setup
 
 ```bash
 just setup
 ```
+
+This builds the Go MCP binary, installs the Python package, and downloads the `tv_controller` binary from the [latest MaudeViewTVCore release](https://github.com/Fomo-Driven-Development/MaudeViewTVCore/releases/latest).
 
 See the [Quick Start guide](https://fomo-driven-development.github.io/MaudeViewTvDocs/quickstart/) for the full walkthrough.
 
